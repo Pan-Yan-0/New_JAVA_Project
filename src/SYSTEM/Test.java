@@ -1,3 +1,5 @@
+package SYSTEM;
+
 import java.util.Random;
 
 public class Test {

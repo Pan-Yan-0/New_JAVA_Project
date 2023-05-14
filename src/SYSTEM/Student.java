@@ -1,12 +1,14 @@
+package SYSTEM;
+
 public class Student {
     private String userName;
     private String userPassword;
-    private int Phone;
+    private long Phone;
 
     public Student() {
     }
 
-    public Student(String userName, String userPassword, int Phone) {
+    public Student(String userName, String userPassword, long Phone) {
         this.userName = userName;
         this.userPassword = userPassword;
         this.Phone = Phone;
@@ -36,6 +38,14 @@ public class Student {
         return userPassword;
     }
 
+    public long getPhone() {
+        return Phone;
+    }
+
+    public void setPhone(long phone) {
+        Phone = phone;
+    }
+
     /**
      * 设置
      * @param userPassword
@@ -44,23 +54,11 @@ public class Student {
         this.userPassword = userPassword;
     }
 
-    /**
-     * 获取
-     * @return Phone
-     */
-    public int getPhone() {
-        return Phone;
-    }
 
-    /**
-     * 设置
-     * @param Phone
-     */
-    public void setPhone(int Phone) {
-        this.Phone = Phone;
-    }
+
+
 
     public String toString() {
-        return "Student{userName = " + userName + ", userPassword = " + userPassword + ", Phone = " + Phone + "}";
+        return "SYSTEM.Student{userName = " + userName + ", userPassword = " + userPassword + ", Phone = " + Phone + "}";
     }
 }
