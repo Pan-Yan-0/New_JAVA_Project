@@ -1,8 +1,6 @@
 package SYSTEM;
-
 import java.io.*;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -68,7 +66,7 @@ public class Main {
                 }
                 int choose = r.nextInt(4);
                 char ch = str[choose];
-                System.out.println("第" + (i + 1) + "题: " + num1 + ch + num2);
+                System.out.println("第" + (i + 1) + "题: " + num1+" " + ch+" " + num2);
                 System.out.println("请输入你的答案");
                 int num = sc.nextInt();
                 if (judge(num1, num2, choose, num)) {
@@ -90,9 +88,9 @@ public class Main {
             } else {
                 System.out.println("还请多加努力");
             }
-            System.out.println("如果想继续考试请输入 1");
-            System.out.println("退出请输入其他");
-            if(sc.nextInt()!=1){
+            System.out.println("如果想继续考试请输入 Y");
+            System.out.println("退出请输入其他 ");
+            if(sc.next().equalsIgnoreCase("N")){
                 break;
             }
         }
@@ -117,7 +115,7 @@ public class Main {
                 System.out.println("文件不存在！！");
             }
             Scanner sc = new Scanner(System.in);
-            boolean judge=true;
+            boolean judge = true;
             String userName;
             String password;
             String userPassword="";
@@ -298,6 +296,7 @@ public class Main {
                 if (num1 + num2 == ans) {
                     return true;
                 } else {
+                    System.out.println("答案应为："+(num1+num2));
                     return false;
                 }
             }
@@ -305,6 +304,7 @@ public class Main {
                 if (num1 - num2 == ans) {
                     return true;
                 } else {
+                    System.out.println("答案应为："+(num1-num2));
                     return false;
                 }
             }
@@ -312,6 +312,7 @@ public class Main {
                 if (num1 * num2 == ans) {
                     return true;
                 } else {
+                    System.out.println("答案应为："+(num1*num2));
                     return false;
                 }
             }
@@ -319,6 +320,7 @@ public class Main {
                 if (num1 / num2 == ans) {
                     return true;
                 } else {
+                    System.out.println("答案应为："+(num1/num2));
                     return false;
                 }
             }
