@@ -8,11 +8,7 @@ import java.util.TimerTask;
 
 
 public class GameJFrame extends JFrame implements MouseListener, KeyListener, ActionListener {
-    //倒计时的数据
-    JLabel timeJLabel = new JLabel("",Font.CENTER_BASELINE);
-
-    Timer timer;
-    int SecondLeft = 120;
+    int seconds = 120;
     //显示是否正确数组
     JLabel[] right = new JLabel[10];
     //显示答案数组
@@ -26,14 +22,12 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     JTextField[] inputModulo = new JTextField[10];
     //总分
     int count = 0;
-
     String[] countCase = {"满分", "优秀", "良好", "及格", "不及格"};
     //答题情况
     boolean[] ansRight = new boolean[10];
     //运算符的选择
     String[] operatorArr = {"混合运算", "加法", "减法", "乘法", "除法"};
     JComboBox chooseOperator = new JComboBox(operatorArr);
-
     /*
      * 运算符选择符号
      * 1 是混合运算的意思
@@ -52,31 +46,27 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     //数据存储
     //第一个数字
     int[] num1Arr = new int[10];
-
     //第二个数字
     int[] num2Arr = new int[10];
     //运算符号
     char[] strArr = new char[10];
     //答案
     int[] ansArr = new int[10];
-
     //余数答案
     int[] ansModuloArr = new int[10];
-
-
     //用户的姓名
     String username = "张三";
     //创建功能的项目栏
     JMenuItem restart = new JMenuItem("重做");
-
     JMenuItem Recode = new JMenuItem("查看历史记录");
-
     JMenuItem exit = new JMenuItem("退出系统");
-
     JMenuItem otherExam = new JMenuItem("另做一套");
-
     JMenu contactOur = new JMenu("关于我们");
     JButton submitButton = new JButton("提交答案");
+    //倒计时的数据
+    private JLabel countdownLabel;
+    private int counter;
+    private Timer timer;
 
     public GameJFrame() {
         //初始框架
@@ -133,7 +123,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     }
 
     private void initText() {
-
+        CountDownDisplay();
         //提交按钮
         submitButton.setBounds(1000, 10, 150, 34);
         submitButton.setFont(new Font("微软雅黑", Font.BOLD, 20));
@@ -459,24 +449,25 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             //显示答题情况
             JLabel showAnswerCase = null;
             if (count >= 100) {
-                showAnswerCase = new JLabel(countCase[0] + ",分数为：" + count);
+                showAnswerCase = new JLabel(countCase[0] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
             } else if (count < 100 && count >= 80) {
-                showAnswerCase = new JLabel(countCase[1] + ",分数为：" + count);
+                showAnswerCase = new JLabel(countCase[1] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
             } else if (count < 80 && count >= 70) {
-                showAnswerCase = new JLabel(countCase[2] + ",分数为：" + count);
+                showAnswerCase = new JLabel(countCase[2] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
             } else if (count < 70 && count >= 60) {
-                showAnswerCase = new JLabel(countCase[3] + ",分数为：" + count);
+                showAnswerCase = new JLabel(countCase[3] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
             } else if (count < 60) {
-                showAnswerCase = new JLabel(countCase[4] + ",分数为：" + count);
+                showAnswerCase = new JLabel(countCase[4] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
             }
-            showAnswerCase.setBounds(100, 440, 200, 30);
+            showAnswerCase.setBounds(100, 440, 500, 30);
             showAnswerCase.setFont(new Font("宋体", Font.BOLD, 20));
             showAnswerCase.setVisible(true);
             this.getContentPane().add(showAnswerCase);
             count = 0;
             //将提交按钮直接设置为不可操作
             submitButton.setEnabled(false);
-
+            timer.stop();
+            seconds = 120;
         } else if (source == chooseOperator) {
             Object selectedItem = chooseOperator.getSelectedItem();
             for (int i = 0; i < operatorArr.length; i++) {
@@ -490,6 +481,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             initText();
             submitButton.setEnabled(true);
             count = 0;
+            seconds = 120;
         } else if (source == chooseTonnage) {
             Object selectedItem = chooseTonnage.getSelectedItem();
             for (int i = 0; i < TonnageArr.length; i++) {
@@ -503,14 +495,119 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             initText();
             submitButton.setEnabled(true);
             count = 0;
+            seconds = 120;
+
+        } else if (source == timer) {
+            counter--;
+            countdownLabel.setText(String.valueOf(counter));
+
+            if (counter == 0) {
+                //提交答案事件
+                int[] inputAnswerArr = new int[10];
+                int[] inputModuloArr = new int[10];
+                for (int i = 0; i < inputModuloArr.length; i++) {
+                    inputAnswerArr[i] = Integer.parseInt(inputAnswer[i].getText());
+                }
+                for (int i = 0; i < inputAnswerArr.length; i++) {
+                    String moduloTest = "";
+                    moduloTest = inputModulo[i].getText();
+                    if (moduloTest.isEmpty()) {
+                        inputModuloArr[i] = 0;
+                    } else {
+                        inputModuloArr[i] = Integer.parseInt(moduloTest);
+                    }
+                }
+                for (int i = 0; i < 10; i++) {
+                    boolean judge = inputAnswerArr[i] == ansArr[i];
+                    if (inputModuloArr[i] != ansModuloArr[i] && strArr[i] == '/') {
+                        judge = false;
+                    }
+                    ansRight[i] = judge;
+                    if (judge) {
+                        count += 10;
+                    }
+                }
+                for (int i = 0; i < 10; i++) {
+                    JLabel jLabel;
+                    if (strArr[i] == '/') {
+                        jLabel = new JLabel("答案为： " + num1Arr[i] + " " + strArr[i] + " " + num2Arr[i] + " = " + ansArr[i] +
+                                "余" + ansModuloArr[i], JLabel.LEFT);
+                    } else {
+                        jLabel = new JLabel("答案为： " + num1Arr[i] + " " + strArr[i] + " " + num2Arr[i] + " = " + ansArr[i]
+                                , JLabel.LEFT);
+                    }
+                    jLabel.setBounds(100 + (i / 5) * 500, 130 + (i % 5) * 70, 350, 18);
+                    jLabel.setFont(new Font("宋体", Font.ROMAN_BASELINE, 18));
+                    JLabel jLabel1;
+                    if (ansRight[i]) {
+                        jLabel1 = new JLabel("回答正确");
+                        jLabel1.setBounds(450 + (i / 5) * 500, 130 + (i % 5) * 70, 200, 18);
+                        jLabel1.setFont(new Font("宋体", Font.ROMAN_BASELINE, 18));
+                        jLabel.setForeground(Color.blue);
+                        jLabel1.setForeground(Color.blue);
+                    } else {
+                        jLabel1 = new JLabel("回答错误");
+                        jLabel1.setBounds(450 + (i / 5) * 500, 130 + (i % 5) * 70, 200, 18);
+                        jLabel1.setFont(new Font("宋体", Font.ROMAN_BASELINE, 18));
+                        jLabel.setForeground(Color.red);
+                        jLabel1.setForeground(Color.red);
+                    }
+                    jLabel1.setVisible(false);
+                    jLabel.setVisible(false);
+                    right[i] = jLabel1;
+                    answerShow[i] = jLabel;
+                    this.getContentPane().add(jLabel);
+                    this.getContentPane().add(jLabel1);
+                }
+                for (int i = 0; i < 10; i++) {
+                    JLabel jLabel = answerShow[i];
+                    jLabel.setVisible(true);
+                    right[i].setVisible(true);
+                }
+
+                //显示答题情况
+                JLabel showAnswerCase = null;
+                if (count >= 100) {
+                    showAnswerCase = new JLabel(countCase[0] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+                } else if (count < 100 && count >= 80) {
+                    showAnswerCase = new JLabel(countCase[1] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+                } else if (count < 80 && count >= 70) {
+                    showAnswerCase = new JLabel(countCase[2] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+                } else if (count < 70 && count >= 60) {
+                    showAnswerCase = new JLabel(countCase[3] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+                } else if (count < 60) {
+                    showAnswerCase = new JLabel(countCase[4] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+                }
+                showAnswerCase.setBounds(100, 440, 500, 30);
+                showAnswerCase.setFont(new Font("宋体", Font.BOLD, 20));
+                showAnswerCase.setVisible(true);
+                this.getContentPane().add(showAnswerCase);
+                count = 0;
+                //将提交按钮直接设置为不可操作
+                submitButton.setEnabled(false);
+                timer.stop();
+                seconds = 120;
+            }
         }
     }
-    private void startCountDown(){
-        timeJLabel.setBounds(10,10,150,150);
-        timeJLabel.setFont(new Font("微软雅黑",Font.BOLD,30));
-        timer = new Timer(1000,e -> {
 
-        });
+    private void CountDownDisplay() {
+        JLabel showTestOfCountDown = new JLabel("倒计时：");
+        showTestOfCountDown.setBounds(30, 0, 200, 50);
+        showTestOfCountDown.setFont(new Font("微软雅黑", Font.BOLD, 30));
+        showTestOfCountDown.setVisible(true);
+        this.getContentPane().add(showTestOfCountDown);
+
+        counter = seconds;
+        countdownLabel = new JLabel(String.valueOf(counter));
+        countdownLabel.setBounds(30, 0, 200, 130);
+        countdownLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        countdownLabel.setVisible(true);
+        this.getContentPane().add(countdownLabel);
+
+        timer = new Timer(1000, this);
+        timer.start();
+        this.getContentPane().setVisible(true);
     }
 
 }
