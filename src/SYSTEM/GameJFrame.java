@@ -3,11 +3,19 @@ package SYSTEM;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 import java.util.TimerTask;
 
 
 public class GameJFrame extends JFrame implements MouseListener, KeyListener, ActionListener {
+    //定义好用户的历史记录的文件路径
+    private String road = new String("src/SYSTEM/RecodeStatus/");
+    File RecodeStatus;
+    //秒
     int seconds = 120;
     //显示是否正确数组
     JLabel[] right = new JLabel[10];
@@ -55,7 +63,8 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     //余数答案
     int[] ansModuloArr = new int[10];
     //用户的姓名
-    String username = "张三";
+    Student User;
+
     //创建功能的项目栏
     JMenuItem restart = new JMenuItem("重做");
     JMenuItem Recode = new JMenuItem("查看历史记录");
@@ -68,7 +77,10 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     private int counter;
     private Timer timer;
 
-    public GameJFrame() {
+    public GameJFrame(Student User) {
+        this.User = User;
+        road += User.getUserName();
+        initRecodeStatus();
         //初始框架
         initJrame();
         //初始菜单
@@ -77,9 +89,23 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
         initData();
         //初始所有主界面
         initText();
+
         //显示应该放在最后
         this.setVisible(true);
+
     }
+
+    private void initRecodeStatus() {
+        RecodeStatus = new File(road);
+        if(!RecodeStatus.exists()){
+            try {
+                RecodeStatus.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 
     public static boolean judge(int num1, int num2, int choose, int ans) {
         switch (choose) {
@@ -131,7 +157,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
         this.getContentPane().add(submitButton);
 
         //用户姓名显示器  运算位数
-        JLabel userName = new JLabel("考生姓名：" + username);
+        JLabel userName = new JLabel("考生姓名：" + User.getUserName());
         userName.setBounds(250, 10, 200, 30);
         userName.setFont(new Font("微软雅黑", Font.BOLD, 20));
         this.getContentPane().add(userName);
@@ -361,7 +387,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             initText();
             submitButton.setEnabled(true);
         } else if (source == Recode) {
-
+            showRecodeStatus();
         } else if (source == exit) {
             //执行直接退出系统
             System.exit(0);
@@ -463,9 +489,11 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             showAnswerCase.setFont(new Font("宋体", Font.BOLD, 20));
             showAnswerCase.setVisible(true);
             this.getContentPane().add(showAnswerCase);
+            outputRecodeStatus();
             count = 0;
             //将提交按钮直接设置为不可操作
             submitButton.setEnabled(false);
+
             timer.stop();
             seconds = 120;
         } else if (source == chooseOperator) {
@@ -588,6 +616,18 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
                 timer.stop();
                 seconds = 120;
             }
+        }
+    }
+
+    private void outputRecodeStatus() {
+
+    }
+
+    private void showRecodeStatus() {
+        try {
+            Desktop.getDesktop().edit(RecodeStatus);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
