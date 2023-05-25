@@ -263,8 +263,9 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
                 num1 = num2;
                 num2 = temp;
             }
-            while (strArr[i] == '/' && num2 == 0) {
+            while (strArr[i] == '/' && (num2 == 0||num1==0)) {
                 num2 = r.nextInt(9) + 1;
+                num1 = r.nextInt(9) + 1;
             }
             if (num1 < num2) {
                 int temp = num1;
@@ -381,11 +382,13 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             //执行重开代码
             submitButton.setEnabled(true);
             initText();
+            repaint();
         } else if (source == otherExam) {
             this.getContentPane().removeAll();
             initData();
             initText();
             submitButton.setEnabled(true);
+            repaint();
         } else if (source == Recode) {
             showRecodeStatus();
             System.out.println("执行到了点击事件");
@@ -496,6 +499,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
 
             timer.stop();
             seconds = 120;
+            repaint();
         } else if (source == chooseOperator) {
             Object selectedItem = chooseOperator.getSelectedItem();
             for (int i = 0; i < operatorArr.length; i++) {
@@ -510,6 +514,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             submitButton.setEnabled(true);
             count = 0;
             seconds = 120;
+            repaint();
         } else if (source == chooseTonnage) {
             Object selectedItem = chooseTonnage.getSelectedItem();
             for (int i = 0; i < TonnageArr.length; i++) {
@@ -524,7 +529,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             submitButton.setEnabled(true);
             count = 0;
             seconds = 120;
-
+            repaint();
         } else if (source == timer) {
             counter--;
             countdownLabel.setText(String.valueOf(counter));

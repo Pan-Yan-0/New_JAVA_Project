@@ -163,6 +163,11 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
                 passwordRepeat.setText("");
             }else {
                 outputStatus();
+                JOptionPane succeed = new JOptionPane("已经重置密码成功");
+                JDialog dialog = succeed.createDialog("success！！");
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+                dialog.setVisible(true);
                 new LoginJFrame();
                 dispose();
             }
