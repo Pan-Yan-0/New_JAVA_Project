@@ -24,7 +24,8 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
     //5.手机号码输入框
     JTextField phone = new JTextField();
 
-    Student newUser=  new Student();
+    Student newUser = new Student();
+
     public RegistJFrame() {
         initJrame();
         initText();
@@ -32,6 +33,7 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
         //显示框架
         this.setVisible(true);
     }
+
     private void initUser() {
         File f = new File("src/SYSTEM/Status");
         try {
@@ -48,6 +50,7 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
         }
         System.out.println("数据处理完成");
     }
+
     private void initJrame() {
         //设置主界面的参数
         this.setSize(680, 580);
@@ -69,14 +72,15 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
 
 
     }
+
     private void outputStatus() {
         try {
-            FileWriter fileWriter = new FileWriter("src/SYSTEM/Status",true);
+            FileWriter fileWriter = new FileWriter("src/SYSTEM/Status", true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            if (!students.isEmpty()){
+            if (!students.isEmpty()) {
                 bufferedWriter.newLine();
             }
-            bufferedWriter.write(newUser.getUserName()+" "+newUser.getUserPassword()+" "+newUser.getPhone());
+            bufferedWriter.write(newUser.getUserName() + " " + newUser.getUserPassword() + " " + newUser.getPhone());
             bufferedWriter.close();
             //创建成功
             System.out.println("创建用户成功！！！");
@@ -85,6 +89,7 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
             System.err.println("文件写入失败：" + e.getMessage());
         }
     }
+
     private void initText() {
         //学生四则运算训练系统
         JLabel titleJLabel = new JLabel("学生四则运算训练系统", JLabel.CENTER);
@@ -150,9 +155,9 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if(source == register){
-            for (Student s: students) {
-                if (s.getUserName().equals(username.getText())||username.getText().isEmpty()){
+        if (source == register) {
+            for (Student s : students) {
+                if (s.getUserName().equals(username.getText()) || username.getText().isEmpty()) {
                     JOptionPane usernameError = new JOptionPane("用户名已存在或者为空");
                     JDialog dialog = usernameError.createDialog("The userName error");
                     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -162,7 +167,7 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
                 }
             }
 
-            if (!(password.getText().equals(passwordRepeat.getText()))||password.getText().isEmpty()){
+            if (!(password.getText().equals(passwordRepeat.getText())) || password.getText().isEmpty()) {
                 JOptionPane passwordError = new JOptionPane("您输入的两次密码不一致或者为空");
                 JDialog dialog = passwordError.createDialog("The password error");
                 dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -170,14 +175,14 @@ public class RegistJFrame extends JFrame implements ActionListener, KeyListener,
                 dialog.setVisible(true);
                 password.setText("");
                 passwordRepeat.setText("");
-            } else if (phone.getText().length()!=11) {
+            } else if (phone.getText().length() != 11) {
                 JOptionPane phoneError = new JOptionPane("您输入的手机号码格式错误");
                 JDialog dialog = phoneError.createDialog("The password error");
                 dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
                 dialog.setVisible(true);
                 phone.setText("");
-            }else {
+            } else {
                 newUser.setUserName(username.getText());
                 newUser.setUserPassword(password.getText());
                 newUser.setPhone(Long.parseLong(phone.getText()));

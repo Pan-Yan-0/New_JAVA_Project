@@ -25,6 +25,7 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
     //5.手机号码输入框
     JTextField phone = new JTextField();
     Student forget;
+
     public ForgetPasswordJFrame(Student forget) {
         this.forget = forget;
         initJrame();
@@ -33,6 +34,7 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
         initUser();
         this.setVisible(true);
     }
+
     private void initUser() {
         File f = new File("src/SYSTEM/Status");
         try {
@@ -49,6 +51,7 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
         }
         System.out.println("数据处理完成");
     }
+
     private void initJrame() {
         //设置主界面的参数
         this.setSize(680, 580);
@@ -70,19 +73,18 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
 
 
     }
+
     private void outputStatus() {
         try {
             FileWriter fileWriter = new FileWriter("src/SYSTEM/Status");
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             int length = students.size();
             for (int i = 0; i < length - 1; i++) {
-                bufferedWriter.write(students.get(i).getUserName() + " " + students.get(i).getUserPassword() + " "
-                        + students.get(i).getPhone());
+                bufferedWriter.write(students.get(i).getUserName() + " " + students.get(i).getUserPassword() + " " + students.get(i).getPhone());
                 bufferedWriter.newLine();
             }
-            if (length!=0){
-                bufferedWriter.write(students.get(length-1).getUserName() + " " + students.get(length-1).getUserPassword() + " "
-                        + students.get(length-1).getPhone());
+            if (length != 0) {
+                bufferedWriter.write(students.get(length - 1).getUserName() + " " + students.get(length - 1).getUserPassword() + " " + students.get(length - 1).getPhone());
                 bufferedWriter.close();
             }
             System.out.println("文件已写入成功！");
@@ -91,6 +93,7 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
         }
 
     }
+
     private void initText() {
         //学生四则运算训练系统
         JLabel titleJLabel = new JLabel("学生四则运算训练系统", JLabel.CENTER);
@@ -145,8 +148,8 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source==register){
-            if (Long.parseLong(phone.getText()) != forget.getPhone()){
+        if (source == register) {
+            if (Long.parseLong(phone.getText()) != forget.getPhone()) {
                 JOptionPane phoneError = new JOptionPane("您输入的电话号码不匹配");
                 JDialog dialog = phoneError.createDialog("The phone error");
                 dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -161,8 +164,13 @@ public class ForgetPasswordJFrame extends JFrame implements KeyListener, MouseLi
                 dialog.setVisible(true);
                 password.setText("");
                 passwordRepeat.setText("");
-            }else {
+            } else {
                 outputStatus();
+                JOptionPane succeed = new JOptionPane("已经重置密码成功");
+                JDialog dialog = succeed.createDialog("success！！");
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+                dialog.setVisible(true);
                 new LoginJFrame();
                 dispose();
             }

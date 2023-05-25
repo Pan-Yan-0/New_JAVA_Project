@@ -9,6 +9,8 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class LoginJFrame extends JFrame implements KeyListener, ActionListener, MouseListener {
+    //存储已经登录用户的信息
+    static ArrayList<Student> LoginUser = new ArrayList<Student>();
     //存储用户的信息
     ArrayList<Student> students = new ArrayList<Student>();
     //显示验证码的框框
@@ -25,28 +27,32 @@ public class LoginJFrame extends JFrame implements KeyListener, ActionListener, 
     JButton login = new JButton();
     //6.添加注册按钮
     JButton register = new JButton();
+    JButton fullLoginJButton = new JButton();
 
     public LoginJFrame() {
         initJrame();
         initUser();
-
         initText();
+        JOptionPane padomError = new JOptionPane("如果您忘记了密码，请先尝试登录一遍");
+        JDialog dialog = padomError.createDialog("The Remain of ForgetPassword ");
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+        dialog.setVisible(true);
         //显示界面
         this.setVisible(true);
 
     }
+
     private void outputStatus() {
         try {
             FileWriter fileWriter = new FileWriter("src/SYSTEM/Status");
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             int length = students.size();
             for (int i = 0; i < length - 1; i++) {
-                bufferedWriter.write(students.get(i).getUserName() + " " + students.get(i).getUserPassword() + " "
-                        + students.get(i).getPhone());
+                bufferedWriter.write(students.get(i).getUserName() + " " + students.get(i).getUserPassword() + " " + students.get(i).getPhone());
                 bufferedWriter.newLine();
             }
-            bufferedWriter.write(students.get(length-1).getUserName() + " " + students.get(length-1).getUserPassword() + " "
-                    + students.get(length-1).getPhone());
+            bufferedWriter.write(students.get(length - 1).getUserName() + " " + students.get(length - 1).getUserPassword() + " " + students.get(length - 1).getPhone());
             bufferedWriter.close();
 
             System.out.println("文件已写入成功！");
@@ -54,6 +60,7 @@ public class LoginJFrame extends JFrame implements KeyListener, ActionListener, 
             System.err.println("文件写入失败：" + e.getMessage());
         }
     }
+
     private void initUser() {
         File f = new File("src/SYSTEM/Status");
         try {
@@ -217,6 +224,13 @@ public class LoginJFrame extends JFrame implements KeyListener, ActionListener, 
         register.setBounds(350, 310, 128, 34);
         register.addActionListener(this);
         this.getContentPane().add(register);
+
+        //登录所有用户的构建
+        fullLoginJButton.setText("登录所有用户");
+        fullLoginJButton.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        fullLoginJButton.setBounds(215, 360, 180, 34);
+        fullLoginJButton.addActionListener(this);
+        this.getContentPane().add(fullLoginJButton);
     }
 
     //重新显示一次验证码，并且改变验证码
@@ -272,54 +286,121 @@ public class LoginJFrame extends JFrame implements KeyListener, ActionListener, 
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source == login) {
-            System.out.println("登录");
-            int index = -1;
-            for (int i = 0; i < students.size(); i++) {
-                if (students.get(i).getUserName().equals(username.getText())) {
-                    index = i;
-                }
-            }
-            if (index == -1) {
-                JOptionPane userNameError = new JOptionPane("没有这个用户名");
-                JDialog dialog = userNameError.createDialog("The code error");
+            LoginJudge();
+            new LoginJFrame();
+        } else if (source == register) {
+            new RegistJFrame();
+            dispose();
+        } else if (source == fullLoginJButton) {
+            if (students.size()<3){
+                System.out.println("不足三人");
+                JOptionPane fullLoginError = new JOptionPane("当前注册的用户注册不足人数，无法执行");
+                JDialog dialog = fullLoginError.createDialog("The fullLogin error");
                 dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
                 dialog.setVisible(true);
-                username.setText("");
-                password.setText("");
-            } else {
-                if (!(password.getText().equals(students.get(index).getUserPassword()))) {
-                    int choice = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(), "密码错误，需要找回密码吗？", "密码错误",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, new String[]{"重新输入", "找回密码"},
-                            "重新输入");
-                    if (choice == JOptionPane.NO_OPTION) {
-                        new ForgetPasswordJFrame(students.get(index));
-                        dispose();
+                return;
+            }
+            for (Student student : students) {
+                Thread t = new Thread(() -> {
+                    System.out.println(student.getUserName() + "申请登录！！");
+                    if (newBegin(student)) {
+                        new GameJFrame(student);
                     }
-                    password.setText("");
-                } else if (!(code.getText().equalsIgnoreCase(codeStr))) {
-                    JOptionPane codeError = new JOptionPane("验证码错误");
-                    JDialog dialog = codeError.createDialog("The code error");
-                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
-                    dialog.setVisible(true);
-                    code.setText("");
-                } else {
-                    JOptionPane codeError = new JOptionPane("登录成功");
-                    JDialog dialog = codeError.createDialog("Succeed");
-                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
-                    dialog.setVisible(true);
-                    code.setText("");
+
+                });
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                t.start();
+            }
+        }
+    }
+
+    private void LoginJudge() {
+        int index = -1;
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).getUserName().equals(username.getText())) {
+                index = i;
+            }
+        }
+        if (index == -1) {
+            JOptionPane userNameError = new JOptionPane("没有这个用户名");
+            JDialog dialog = userNameError.createDialog("The code error");
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+            dialog.setVisible(true);
+            username.setText("");
+            password.setText("");
+        } else {
+            if (!newBegin(students.get(index))) {
+                return;
+            }
+            if (!(password.getText().equals(students.get(index).getUserPassword()))) {
+                int choice = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(), "密码错误，需要找回密码吗？", "密码错误",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, new String[]{"重新输入", "找回密码"},
+                        "重新输入");
+                if (choice == JOptionPane.NO_OPTION) {
+                    new ForgetPasswordJFrame(students.get(index));
                     dispose();
-                    GameJFrame gameJFrame = new GameJFrame(students.get(index));
+                }
+                password.setText("");
+            } else if (!(code.getText().equalsIgnoreCase(codeStr))) {
+                JOptionPane codeError = new JOptionPane("验证码错误");
+                JDialog dialog = codeError.createDialog("The code error");
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+                dialog.setVisible(true);
+                code.setText("");
+            } else {
+                JOptionPane codeError = new JOptionPane("登录成功");
+                JDialog dialog = codeError.createDialog("Succeed");
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+                dialog.setVisible(true);
+                code.setText("");
+                dispose();
+                GameJFrame gameJFrame = new GameJFrame(students.get(index));
+            }
+        }
+    }
+
+    private boolean newBegin(Student student) {
+        synchronized (LoginUser) {
+            for (Student s : LoginUser) {
+                if (s.getUserName().equals(student.getUserName())) {
+                    System.out.println("12312312312");
+                    JOptionPane padomError = new JOptionPane(student.getUserName() + "已经登录！！");
+                    JDialog dialog = padomError.createDialog("The Login error");
+                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                    dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+                    dialog.setVisible(true);
+                    username.setText("");
+                    password.setText("");
+                    return false;
                 }
             }
-
-        } else if (source==register) {
-            new RegistJFrame();
-            dispose();
+            if (LoginUser.size() < 3) {
+                LoginUser.add(student); // 将学生数据添加到列表
+                System.out.println(student.getUserName() + "登录成功！！");
+            } else {
+                JOptionPane loginError = new JOptionPane(student.getUserName() + "登录人数已满！！");
+                JDialog dialog = loginError.createDialog("The Login error");
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+                dialog.setVisible(true);
+                System.out.println(student.getUserName() + "登录人数已满！");
+                return false;
+            }
         }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 
     @Override

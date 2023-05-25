@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
-import java.util.TimerTask;
 
 
 public class GameJFrame extends JFrame implements MouseListener, KeyListener, ActionListener {
@@ -263,8 +262,9 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
                 num1 = num2;
                 num2 = temp;
             }
-            while (strArr[i] == '/' && num2 == 0) {
+            while (strArr[i] == '/' && (num2 == 0 || num1 == 0)) {
                 num2 = r.nextInt(9) + 1;
+                num1 = r.nextInt(9) + 1;
             }
             if (num1 < num2) {
                 int temp = num1;
@@ -302,7 +302,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
 
     private void initJrame() {
         //设置主界面的参数
-        this.setSize(1200, 580);
+        this.setSize(1200, 550);
 
         //设置页面居中
         this.setLocationRelativeTo(null);
@@ -381,17 +381,31 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             //执行重开代码
             submitButton.setEnabled(true);
             initText();
+            repaint();
         } else if (source == otherExam) {
             this.getContentPane().removeAll();
             initData();
             initText();
             submitButton.setEnabled(true);
+            repaint();
         } else if (source == Recode) {
             showRecodeStatus();
-            System.out.println("执行到了点击事件");
         } else if (source == exit) {
-            //执行直接退出系统
-            System.exit(0);
+            //打印所退出登录用户
+            System.out.println(User.getUserName()+"退出登录，现在登录人数为："+(LoginJFrame.LoginUser.size()-1));
+            System.out.println("现在仍在登录的有:");
+
+
+            int index = 0;
+            for (int i = 0; i < LoginJFrame.LoginUser.size(); i++) {
+                if (User.getUserName().equals(LoginJFrame.LoginUser.get(i).getUserName())){
+                    index = i;
+                }else {
+                    System.out.print("|"+LoginJFrame.LoginUser.get(i).getUserName());
+                }
+            }
+            LoginJFrame.LoginUser.remove(index);
+            dispose();
         }
 
     }
@@ -411,9 +425,20 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
         Object source = e.getSource();
         if (source == submitButton) {
             //提交答案事件
-
             for (int i = 0; i < inputModuloArr.length; i++) {
-                inputAnswerArr[i] = Integer.parseInt(inputAnswer[i].getText());
+                if (inputAnswer[i].getText().isEmpty()&&count!=0){
+                    JOptionPane inputError = new JOptionPane("您还有未做的题目，请先作答再提交");
+                    JDialog dialog = inputError.createDialog("The Login error");
+                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                    dialog.setAlwaysOnTop(true); // 将窗口置于其他窗口之前
+                    dialog.setVisible(true);
+                    return;
+                }
+                if (inputAnswer[i].getText().isEmpty()){
+                    inputAnswerArr[i] = -1;
+                }else {
+                    inputAnswerArr[i] = Integer.parseInt(inputAnswer[i].getText());
+                }
             }
             for (int i = 0; i < inputAnswerArr.length; i++) {
                 String moduloTest = "";
@@ -496,6 +521,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
 
             timer.stop();
             seconds = 120;
+            repaint();
         } else if (source == chooseOperator) {
             Object selectedItem = chooseOperator.getSelectedItem();
             for (int i = 0; i < operatorArr.length; i++) {
@@ -510,6 +536,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             submitButton.setEnabled(true);
             count = 0;
             seconds = 120;
+            repaint();
         } else if (source == chooseTonnage) {
             Object selectedItem = chooseTonnage.getSelectedItem();
             for (int i = 0; i < TonnageArr.length; i++) {
@@ -524,7 +551,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             submitButton.setEnabled(true);
             count = 0;
             seconds = 120;
-
+            repaint();
         } else if (source == timer) {
             counter--;
             countdownLabel.setText(String.valueOf(counter));
@@ -532,7 +559,11 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             if (counter == 0) {
                 //提交答案事件
                 for (int i = 0; i < inputModuloArr.length; i++) {
-                    inputAnswerArr[i] = Integer.parseInt(inputAnswer[i].getText());
+                    if (inputAnswer[i].getText().isEmpty()){
+                        inputAnswerArr[i] = -1;
+                    }else {
+                        inputAnswerArr[i] = Integer.parseInt(inputAnswer[i].getText());
+                    }
                 }
                 for (int i = 0; i < inputAnswerArr.length; i++) {
                     String moduloTest = "";
@@ -615,6 +646,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
                 submitButton.setEnabled(false);
                 timer.stop();
                 seconds = 120;
+                repaint();
             }
         }
     }
