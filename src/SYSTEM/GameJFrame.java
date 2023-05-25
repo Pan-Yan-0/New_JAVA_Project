@@ -12,9 +12,9 @@ import java.util.TimerTask;
 
 
 public class GameJFrame extends JFrame implements MouseListener, KeyListener, ActionListener {
-    //定义好用户的历史记录的文件路径
-    private String road = new String("src/SYSTEM/RecodeStatus/");
     File RecodeStatus;
+    int[] inputAnswerArr = new int[10];
+    int[] inputModuloArr = new int[10];
     //秒
     int seconds = 120;
     //显示是否正确数组
@@ -64,7 +64,6 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     int[] ansModuloArr = new int[10];
     //用户的姓名
     Student User;
-
     //创建功能的项目栏
     JMenuItem restart = new JMenuItem("重做");
     JMenuItem Recode = new JMenuItem("查看历史记录");
@@ -72,6 +71,8 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     JMenuItem otherExam = new JMenuItem("另做一套");
     JMenu contactOur = new JMenu("关于我们");
     JButton submitButton = new JButton("提交答案");
+    //定义好用户的历史记录的文件路径
+    private String road = "D:\\JavaProject\\Little_Student_Math\\src\\SYSTEM\\RecodeStatus\\";
     //倒计时的数据
     private JLabel countdownLabel;
     private int counter;
@@ -94,18 +95,6 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
         this.setVisible(true);
 
     }
-
-    private void initRecodeStatus() {
-        RecodeStatus = new File(road);
-        if(!RecodeStatus.exists()){
-            try {
-                RecodeStatus.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
 
     public static boolean judge(int num1, int num2, int choose, int ans) {
         switch (choose) {
@@ -146,6 +135,17 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             }
         }
         return true;
+    }
+
+    private void initRecodeStatus() {
+        RecodeStatus = new File(road);
+        if (!RecodeStatus.exists()) {
+            try {
+                RecodeStatus.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void initText() {
@@ -388,6 +388,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             submitButton.setEnabled(true);
         } else if (source == Recode) {
             showRecodeStatus();
+            System.out.println("执行到了点击事件");
         } else if (source == exit) {
             //执行直接退出系统
             System.exit(0);
@@ -410,8 +411,7 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
         Object source = e.getSource();
         if (source == submitButton) {
             //提交答案事件
-            int[] inputAnswerArr = new int[10];
-            int[] inputModuloArr = new int[10];
+
             for (int i = 0; i < inputModuloArr.length; i++) {
                 inputAnswerArr[i] = Integer.parseInt(inputAnswer[i].getText());
             }
@@ -531,8 +531,6 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
 
             if (counter == 0) {
                 //提交答案事件
-                int[] inputAnswerArr = new int[10];
-                int[] inputModuloArr = new int[10];
                 for (int i = 0; i < inputModuloArr.length; i++) {
                     inputAnswerArr[i] = Integer.parseInt(inputAnswer[i].getText());
                 }
@@ -558,11 +556,13 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
                 for (int i = 0; i < 10; i++) {
                     JLabel jLabel;
                     if (strArr[i] == '/') {
-                        jLabel = new JLabel("答案为： " + num1Arr[i] + " " + strArr[i] + " " + num2Arr[i] + " = " + ansArr[i] +
-                                "余" + ansModuloArr[i], JLabel.LEFT);
+                        jLabel =
+                                new JLabel("答案为： " + num1Arr[i] + " " + strArr[i] + " " + num2Arr[i] + " = " + ansArr[i] +
+                                        "余" + ansModuloArr[i], JLabel.LEFT);
                     } else {
-                        jLabel = new JLabel("答案为： " + num1Arr[i] + " " + strArr[i] + " " + num2Arr[i] + " = " + ansArr[i]
-                                , JLabel.LEFT);
+                        jLabel =
+                                new JLabel("答案为： " + num1Arr[i] + " " + strArr[i] + " " + num2Arr[i] + " = " + ansArr[i]
+                                        , JLabel.LEFT);
                     }
                     jLabel.setBounds(100 + (i / 5) * 500, 130 + (i % 5) * 70, 350, 18);
                     jLabel.setFont(new Font("宋体", Font.ROMAN_BASELINE, 18));
@@ -620,12 +620,50 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
     }
 
     private void outputRecodeStatus() {
-
+        try {
+            FileWriter fileWriter = new FileWriter(road, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            for (int i = 0; i < num1Arr.length; i++) {
+                bufferedWriter.write("题目" + (i + 1) + ":");
+                bufferedWriter.newLine();
+                bufferedWriter.write(num1Arr[i] + " " + strArr[i] + " " + num2Arr[i]);
+                bufferedWriter.newLine();
+                bufferedWriter.write("您的答案为：" + inputAnswerArr[i] + "余" + inputModuloArr[i]);
+                bufferedWriter.newLine();
+                bufferedWriter.write("正确答案为：" + ansArr[i] + "余" + ansModuloArr[i]);
+                bufferedWriter.newLine();
+                if (ansRight[i]) {
+                    bufferedWriter.write("您的回答是正确的");
+                    bufferedWriter.newLine();
+                } else {
+                    bufferedWriter.write("您的回答是错误的");
+                    bufferedWriter.newLine();
+                }
+            }
+            if (count >= 100) {
+                bufferedWriter.write(countCase[0] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+            } else if (count < 100 && count >= 80) {
+                bufferedWriter.write(countCase[1] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+            } else if (count < 80 && count >= 70) {
+                bufferedWriter.write(countCase[2] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+            } else if (count < 70 && count >= 60) {
+                bufferedWriter.write(countCase[3] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+            } else if (count < 60) {
+                bufferedWriter.write(countCase[4] + ",分数为：" + count + " 耗时：" + (120 - counter) + "秒");
+            }
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+            fileWriter.flush();
+        } catch (IOException e) {
+            System.err.println("文件写入失败：" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void showRecodeStatus() {
         try {
-            Desktop.getDesktop().edit(RecodeStatus);
+            ProcessBuilder pb = new ProcessBuilder("notepad.exe", road);
+            pb.start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
