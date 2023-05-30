@@ -371,7 +371,7 @@ public class LoginJFrame extends JFrame implements KeyListener, ActionListener, 
         synchronized (LoginUser) {
             for (Student s : LoginUser) {
                 if (s.getUserName().equals(student.getUserName())) {
-                    System.out.println("12312312312");
+                    System.out.println(student.getUserName()+"登录失败");
                     JOptionPane padomError = new JOptionPane(student.getUserName() + "已经登录！！");
                     JDialog dialog = padomError.createDialog("The Login error");
                     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -386,6 +386,7 @@ public class LoginJFrame extends JFrame implements KeyListener, ActionListener, 
                 LoginUser.add(student); // 将学生数据添加到列表
                 System.out.println(student.getUserName() + "登录成功！！");
             } else {
+                System.out.println(student.getUserName()+"登录失败");
                 JOptionPane loginError = new JOptionPane(student.getUserName() + "登录人数已满！！");
                 JDialog dialog = loginError.createDialog("The Login error");
                 dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

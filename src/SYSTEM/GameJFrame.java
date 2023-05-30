@@ -393,8 +393,22 @@ public class GameJFrame extends JFrame implements MouseListener, KeyListener, Ac
             showRecodeStatus();
             System.out.println("执行到了点击事件");
         } else if (source == exit) {
-            //执行直接退出系统
-            System.exit(0);
+            System.out.println(User.getUserName() + "退出系统,现在登录人数为：" + (LoginJFrame.LoginUser.size()-1));
+            int index = 0;
+            if (LoginJFrame.LoginUser.size()!=1){
+                System.out.println("现在在线的人有：");
+            }else {
+                System.out.println("无人登录");
+            }
+            for (int i = 0; i < LoginJFrame.LoginUser.size(); i++) {
+                if (User.getUserName().equals(LoginJFrame.LoginUser.get(i).getUserName())){
+                    index = i;
+                }else {
+                    System.out.print("|"+LoginJFrame.LoginUser.get(i).getUserName());
+                }
+            }
+            LoginJFrame.LoginUser.remove(index);
+            dispose();
         }
 
     }
